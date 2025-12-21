@@ -24,7 +24,11 @@ if (ENV.NODE_ENV === "production") {
   });
 }
 
-app.listen(ENV.PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  connectDB();
-});
+const startServer = async () => {
+  await connectDB();
+  app.listen(ENV.PORT, () => {
+    console.log(`Server is running on http://localhost:${ENV.PORT}`);
+  });
+};
+
+startServer();
