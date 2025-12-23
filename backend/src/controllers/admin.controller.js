@@ -68,20 +68,19 @@ export async function updateProduct(req, res) {
     const { id } = req.params;
     const { name, description, price, stock, category } = req.body;
 
+    let imageUrls = [];
     if (req.files && req.files.length > 0) {
       if (req.files.length > 3) {
         return res
           .status(400)
           .json({ message: "A maximum of 3 images are allowed." });
       }
+      const uploadPromises = req.files.map((file) => {
+        return cloudinary.uploader.upload(file.path, { folder: "products" });
+      });
+      const uploadResults = await Promise.all(uploadPromises);
+      imageUrls = uploadResults.map((result) => result.secure_url);
     }
-
-    const uploadPromises = req.files.map((file) => {
-      return cloudinary.uploader.upload(file.path, { folder: "products" });
-    });
-
-    const uploadResults = await Promise.all(uploadPromises);
-    const imageUrls = uploadResults.map((result) => result.secure_url);
 
     const newlyUpdatedProduct = await Product.findByIdAndUpdate(
       id,
@@ -92,9 +91,8 @@ export async function updateProduct(req, res) {
         stock: parseInt(stock),
         category,
         images: imageUrls,
-        runValidators: true,
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!newlyUpdatedProduct) {
