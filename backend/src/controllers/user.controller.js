@@ -4,7 +4,7 @@ export async function addAddress(req, res) {
   try {
     const {
       label,
-      fullname,
+      fullName,
       streetAddress,
       city,
       state,
@@ -17,7 +17,7 @@ export async function addAddress(req, res) {
 
     if (
       !label ||
-      !fullname ||
+      !fullName ||
       !streetAddress ||
       !city ||
       !state ||
@@ -35,7 +35,7 @@ export async function addAddress(req, res) {
     }
     user.addresses.push({
       label,
-      fullname,
+      fullName,
       streetAddress,
       city,
       state,
@@ -73,7 +73,7 @@ export async function updateAddress(req, res) {
     const { addressId } = req.params;
     const {
       label,
-      fullname,
+      fullName,
       streetAddress,
       city,
       state,
@@ -92,7 +92,7 @@ export async function updateAddress(req, res) {
       user.addresses.forEach((address) => (address.isDefault = false));
     }
     address.label = label || address.label;
-    address.fullname = fullname || address.fullname;
+    address.fullName = fullName || address.fullName;
     address.streetAddress = streetAddress || address.streetAddress;
     address.city = city || address.city;
     address.state = state || address.state;
@@ -104,7 +104,12 @@ export async function updateAddress(req, res) {
       message: "Address updated successfully.",
       addresses: user.addresses,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error updating address:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error.", error: error.message });
+  }
 }
 
 export async function deleteAddress(req, res) {
@@ -152,7 +157,8 @@ export async function addToWishlist(req, res) {
 
 export async function getWishlist(req, res) {
   try {
-    const user = req.user;
+    // we are using populate, because wishlist is just an array of product IDs
+    const user = await User.findById(req.user._id).populate("wishlist");
     return res.status(200).json({ wishlist: user.wishlist });
   } catch (error) {
     console.error("Error retrieving wishlist:", error);

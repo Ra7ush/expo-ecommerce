@@ -1,12 +1,14 @@
 import { Router } from "express";
-import { addAddress } from "../controllers/user.controller.js";
 import {
-  protectRoute,
+  addAddress,
   getAddresses,
   updateAddress,
   deleteAddress,
-} from "../middlewares/auth.middleware.js";
-
+  addToWishlist,
+  getWishlist,
+  removeFromWishlist,
+} from "../controllers/user.controller.js";
+import { protectRoute } from "../middlewares/auth.middleware.js";
 const router = Router();
 
 router.use(protectRoute);
