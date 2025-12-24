@@ -8,7 +8,7 @@ import {
   getWishlist,
   removeFromWishlist,
 } from "../controllers/user.controller.js";
-import { protectRoute } from "../middlewares/auth.middleware.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 const router = Router();
 
 router.use(protectRoute);
