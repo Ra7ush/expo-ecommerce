@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    address: [addressSchema],
+    addresses: [addressSchema],
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,
