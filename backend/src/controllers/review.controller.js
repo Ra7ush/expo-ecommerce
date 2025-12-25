@@ -31,7 +31,7 @@ export async function createReview(req, res) {
 
     //verify product is in the order
     const productInOrder = order.products.find(
-      (item) => item.produc.toString() === productId.toString()
+      (item) => item.product.toString() === productId.toString()
     );
     if (!productInOrder) {
       return res
@@ -57,13 +57,23 @@ export async function createReview(req, res) {
     });
 
     // update the product rating
-    const product = await Product.findById(productId);
     const reviews = await Review.find({ productId });
     const totalRatings = reviews.reduce((sum, rev) => sum + rev.rating, 0);
-    product.averageRating = totalRatings / reviews.length;
-    product.totalReviews = reviews.length;
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      {
+        averageRating: totalRatings / reviews.length,
+        totalReviews: reviews.length,
+      },
+      { new: true, validateBeforeSave: true }
+    );
 
-    await product.save();
+    if (!updatedProduct) {
+      await Review.findByIdAndDelete(review._id);
+      return res
+        .status(500)
+        .json({ message: "Failed to update product rating" });
+    }
 
     res.status(201).json({ message: "Review created successfully", review });
   } catch (error) {

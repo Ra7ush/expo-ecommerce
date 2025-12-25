@@ -1,7 +1,5 @@
 import { Product } from "../models/product.model.js";
 
-export async function getAllProducts(req, res) {}
-
 export async function getProductById(req, res) {
   try {
     const { id } = req.params;
