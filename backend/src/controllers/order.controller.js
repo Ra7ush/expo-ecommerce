@@ -2,7 +2,7 @@ import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
 import { Review } from "../models/review.model.js";
 
-export const createOrder = async (req, res) => {
+export async function createOrder(req, res) {
   const session = await Order.startSession();
   session.startTransaction();
 
@@ -57,9 +57,9 @@ export const createOrder = async (req, res) => {
   } finally {
     session.endSession();
   }
-};
+}
 
-export const getUserOrders = async (req, res) => {
+export async function getUserOrders(req, res) {
   try {
     const user = req.user;
     const orders = await Order.find({ clerkId: user.clerkId })
@@ -83,4 +83,4 @@ export const getUserOrders = async (req, res) => {
     console.error("Error fetching user orders:", error);
     return res.status(500).json({ message: "Server error" });
   }
-};
+}
