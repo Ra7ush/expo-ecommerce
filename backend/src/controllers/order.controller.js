@@ -2,6 +2,19 @@ import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
 import { Review } from "../models/review.model.js";
 
+/**
+ * Create a new order for the authenticated user, atomically decrementing product stock and returning the created order.
+ *
+ * Attempts to reserve stock for all order items inside a MongoDB transaction and creates the Order if all reservations succeed.
+ * Sends:
+ * - 201 with { message: "Order created", order } on success,
+ * - 400 with { message: "No order items provided" } if no items were supplied,
+ * - 400 with { message: "Insufficient stock for one or more products" } if stock cannot be reserved for every item,
+ * - 500 with { message: "Server error" } on other failures.
+ *
+ * @param {import('express').Request} req - Express request; expects `req.user` (authenticated user) and `req.body` containing `orderItems`, `shippingAddress`, `paymentResult`, and `totalPrice`.
+ * @param {import('express').Response} res - Express response used to send HTTP status and JSON payloads.
+ */
 export async function createOrder(req, res) {
   const session = await Order.startSession();
   session.startTransaction();
@@ -59,6 +72,15 @@ export async function createOrder(req, res) {
   }
 }
 
+/**
+ * Retrieve orders for the authenticated user's clerk and include whether each order has an associated review.
+ *
+ * Queries orders filtered by req.user.clerkId, populates each order's products, sorts results by creation time (newest first),
+ * and adds a `hasReview` boolean to each order indicating whether a Review exists for that order.
+ *
+ * @param {import('express').Request} req - Express request; expects `req.user.clerkId` to identify the clerk.
+ * @param {import('express').Response} res - Express response used to send the JSON result.
+ */
 export async function getUserOrders(req, res) {
   try {
     const user = req.user;

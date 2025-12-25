@@ -2,6 +2,14 @@ import { Review } from "../models/review.model.js";
 import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
 
+/**
+ * Create a review for a product tied to a delivered order and update the product's average rating.
+ *
+ * Creates a new review when the authenticated user is authorized to review the specified order, the order has status "delivered", the product is part of the order, and the user has not already reviewed the product. After creating the review, recalculates and persists the product's `averageRating` and `totalReviews`.
+ *
+ * @param {object} req - Express request; expects `req.user` (authenticated user) and `req.body` containing `productId`, `orderId`, and `rating` (integer 1–5).
+ * @param {object} res - Express response used to send HTTP status codes and JSON responses.
+ */
 export async function createReview(req, res) {
   try {
     const { productId, orderId, rating } = req.body;
@@ -72,6 +80,11 @@ export async function createReview(req, res) {
   }
 }
 
+/**
+ * Delete a review owned by the authenticated user and update the associated product's rating summary.
+ *
+ * Finds the review by ID from the request parameters, verifies the authenticated user is the review owner, deletes the review, recalculates the product's averageRating and totalReviews from remaining reviews, persists those updates, and sends an appropriate HTTP response.
+ */
 export async function deleteReview(req, res) {
   try {
     const { reviewId } = req.params;
