@@ -50,7 +50,7 @@ export async function addToCart(req, res) {
     );
     if (existingItem) {
       //increment quantity by 1
-      const newQuantity = existingItem.quantity + 1;
+      const newQuantity = existingItem.quantity + quantity;
       if (product.stock < newQuantity) {
         return res.status(400).json({ message: "Insufficient stock" });
       }
@@ -107,16 +107,20 @@ export async function updateCartItem(req, res) {
 export async function removeFromCart(req, res) {
   try {
     const { productId } = req.params;
-
     const cart = await Cart.findOne({ clerkId: req.user.clerkId });
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
+    }
+    const itemExists = cart.items.some(
+      (item) => item.product.toString() === productId
+    );
+    if (!itemExists) {
+      return res.status(404).json({ message: "Product not in cart" });
     }
     cart.items = cart.items.filter(
       (item) => item.product.toString() !== productId
     );
     await cart.save();
-
     res.status(200).json({ message: "Product removed from cart", cart });
   } catch (error) {
     console.error("Error removing from cart:", error);
