@@ -15,4 +15,5 @@ export const ENV = {
   ADMIN_EMAILS: process.env.ADMIN_EMAILS
     ? process.env.ADMIN_EMAILS.split(",")
     : [],
+  CLIENT_URL: process.env.CLIENT_URL,
 };
