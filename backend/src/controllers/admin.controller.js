@@ -3,6 +3,7 @@ import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
 import { User } from "../models/user.model.js";
 
+// admin controller this function will be used to create a new product
 export async function createProduct(req, res) {
   try {
     const { name, description, price, stock, category } = req.body;
