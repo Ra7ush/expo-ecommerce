@@ -10,7 +10,7 @@ function DashboardLayout() {
         type="checkbox"
         id="my-drawer"
         className="drawer-toggle"
-        defaultChecked
+        // defaultChecked
       />
       <div className="drawer-content flex flex-col">
         <Navbar />

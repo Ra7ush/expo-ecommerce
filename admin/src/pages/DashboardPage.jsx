@@ -2,6 +2,7 @@ import React from "react";
 import { Link, Outlet } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { orderAPi, statsApi } from "../lib/api";
+import { getOrderStatusBadge } from "../lib/utils";
 import {
   ShoppingCartIcon,
   UserIcon,
@@ -111,11 +112,18 @@ function DashboardPage() {
                       <td>
                         <div className="flex flex-col">
                           <span className="font-medium text-sm">
-                            {order.user?.name || "Guest"}
+                            {order.shippingAddress.fullName || "Guest"}
                           </span>
                           <span className="text-xs opacity-50">
-                            {order.user?.email}
+                            {order.orderItems.length} items(s)
                           </span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="text-sm">
+                          {order.orderItems[0]?.name}
+                          {order.orderItems.length > 1 &&
+                            ` +${order.orderItems.length - 1} more`}
                         </div>
                       </td>
                       <td className="font-bold">
@@ -123,8 +131,9 @@ function DashboardPage() {
                       </td>
                       <td>
                         <div
-                          className={`badge badge-sm font-medium ${
-                            order.status === "delivered"
+                          className={`badge badge-sm font-medium ${getOrderStatusBadge(
+                            order.status
+                          )} === "delivered"
                               ? "badge-success"
                               : order.status === "shipped"
                               ? "badge-info"

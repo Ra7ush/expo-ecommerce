@@ -6,7 +6,6 @@ import {
   ShoppingBagIcon,
   ClipboardListIcon,
   UsersIcon,
-  ChartBarIcon,
   PanelLeftIcon,
 } from "lucide-react";
 
@@ -35,7 +34,6 @@ export const NAVIGATION = [
 ];
 function Navbar() {
   const location = useLocation();
-  console.log(location);
   return (
     <div className="navbar w-full bg-base-300">
       <label

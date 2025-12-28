@@ -12,6 +12,8 @@ export const ENV = {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
-  ADMIN_EMAILS: process.env.ADMIN_EMAILS.split(","),
+  ADMIN_EMAILS: process.env.ADMIN_EMAILS
+    ? process.env.ADMIN_EMAILS.split(",")
+    : [],
   CLIENT_URL: process.env.CLIENT_URL,
 };

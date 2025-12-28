@@ -1,6 +1,5 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { statsApi } from "../lib/api";
 import {
   UsersIcon,
   MailIcon,
