@@ -25,7 +25,8 @@ app.use(
     origin: ENV.CLIENT_URL, // Adjust this to your frontend's origin
     credentials: true, // Allow the browser to send cookies to the server with requests
   })
-);
+); //CORS (Cross-Origin Resource Sharing) in Express.js is a mechanism that
+// allows a server to explicitly permit web browsers to access its resources from a different origin
 
 // Inngest webhook endpoint
 app.use("/api/inngest", serve({ client: inngest, functions }));
@@ -45,18 +46,16 @@ app.get("/api/health", (req, res) => {
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../admin/dist")));
 
-  app.get("/{*any}", (req, res) => {
-    app.use(
-      res.sendFile(path.join(__dirname, "../admin", "dist", "index.html"))
-    );
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../admin", "dist", "index.html"));
   });
 }
 
 const startServer = async () => {
   await connectDB();
   console.log("Connected to database");
-  app.listen(ENV.PORT, () => {
-    console.log(`Server is running on http://localhost:${ENV.PORT}`);
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
   });
 };
 
