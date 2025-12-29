@@ -7,6 +7,7 @@ import {
   updateOrderStatus,
   getAllCustomers,
   getDashboardStats,
+  deleteProduct,
 } from "../controllers/admin.controller.js";
 import { adminOnly, protectRoute } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
@@ -18,6 +19,8 @@ router.use(protectRoute, adminOnly); // Apply authentication and admin authoriza
 router.post("/products", upload.array("images", 3), createProduct);
 router.get("/products", getAllProducts);
 router.put("/products/:id", upload.array("images", 3), updateProduct);
+//delete product route can be added here in future
+router.delete("/products/:id", deleteProduct);
 
 router.get("/orders", getAllOrders);
 router.patch("/orders/:id/status", updateOrderStatus);
