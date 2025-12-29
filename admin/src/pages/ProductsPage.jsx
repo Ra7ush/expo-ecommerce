@@ -173,6 +173,12 @@ function ProductsPage() {
     if (images.length > 0)
       images.forEach((image) => formDataToSend.append("images", image));
 
+    // preserve existing images during update
+    const existingImages = imagePreviews.filter((p) => !p.startsWith("blob:"));
+    existingImages.forEach((img) =>
+      formDataToSend.append("existingImages", img)
+    );
+
     if (editingProduct) {
       updateProductMutation.mutate({
         id: editingProduct._id,
@@ -271,7 +277,8 @@ function ProductsPage() {
                         className="btn btn-square btn-ghost text-error"
                         onClick={() => setProductToDelete(product)}
                       >
-                        {deleteProductMutation.isPending ? (
+                        {deleteProductMutation.isPending &&
+                        productToDelete?._id === product._id ? (
                           <span className="loading loading-spinner"></span>
                         ) : (
                           <Trash2Icon className="w-5 h-5" />
@@ -502,7 +509,10 @@ function ProductsPage() {
             </button>
             <button
               className="btn btn-error"
-              onClick={() => deleteProductMutation.mutate(productToDelete._id)}
+              onClick={() =>
+                productToDelete &&
+                deleteProductMutation.mutate(productToDelete._id)
+              }
               disabled={deleteProductMutation.isPending}
             >
               {deleteProductMutation.isPending ? (

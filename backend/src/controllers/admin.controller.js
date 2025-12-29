@@ -67,7 +67,8 @@ export async function getAllProducts(req, res) {
 export async function updateProduct(req, res) {
   try {
     const { id } = req.params;
-    const { name, description, price, stock, category } = req.body;
+    const { name, description, price, stock, category, existingImages } =
+      req.body;
 
     const product = await Product.findById(id);
     if (!product) {
@@ -80,9 +81,19 @@ export async function updateProduct(req, res) {
     if (stock !== undefined) product.stock = parseInt(stock);
     if (category) product.category = category;
 
-    // handle image updates if new images are uploaded
+    // handle image updates
+    let updatedImages = [];
+
+    // 1. Add existing images that the user kept
+    if (existingImages) {
+      updatedImages = Array.isArray(existingImages)
+        ? existingImages
+        : [existingImages];
+    }
+
+    // 2. Add new images if uploaded
     if (req.files && req.files.length > 0) {
-      if (req.files.length > 3) {
+      if (updatedImages.length + req.files.length > 3) {
         return res.status(400).json({ message: "Maximum 3 images allowed" });
       }
 
@@ -93,7 +104,15 @@ export async function updateProduct(req, res) {
       });
 
       const uploadResults = await Promise.all(uploadPromises);
-      product.images = uploadResults.map((result) => result.secure_url);
+      const newImageUrls = uploadResults.map((result) => result.secure_url);
+      updatedImages = [...updatedImages, ...newImageUrls];
+    }
+
+    // 3. Update the product's images array if we have images to set
+    // This allows for removing images, adding images, or keeping them the same.
+    // We only update if something was provided (either existing or new)
+    if (existingImages || (req.files && req.files.length > 0)) {
+      product.images = updatedImages;
     }
 
     await product.save();
@@ -107,13 +126,24 @@ export async function updateProduct(req, res) {
 export async function deleteProduct(req, res) {
   try {
     const { id } = req.params;
-    const deletedProduct = await Product.findByIdAndDelete(id);
-
-    if (!deletedProduct) {
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    return res.status(200).json({ message: "Product deleted" });
+    // Delete images from Cloudinary
+    if (product.images && product.images.length > 0) {
+      const deletePromises = product.images.map((imageUrl) => {
+        // Extract public_id from URL (assumes format: .../products/publicId.ext)
+        const publicId =
+          "products/" + imageUrl.split("/products/")[1]?.split(".")[0];
+        if (publicId) return cloudinary.uploader.destroy(publicId);
+      });
+      await Promise.all(deletePromises.filter(Boolean));
+    }
+
+    await Product.findByIdAndDelete(id);
+    res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error("Error deleting product:", error);
     return res
